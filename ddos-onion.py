@@ -3,8 +3,6 @@ import ssl
 import random
 import logging
 
-# ... (other imports)
-
 DEFAULT_USER_AGENTS = [
     # ... (other user-agents)
 ]
@@ -49,8 +47,12 @@ def init_socket(ip: str, args, identity):
 
 def ddos_onion():
     # Main function of the program
-    print("Hello, ddos-onion!")
-    # Add your actual code here
+    logging.basicConfig(level=logging.DEBUG)
+    logging.debug("Hello, ddos-onion!")
+
+    # Replace the following line with your actual logic
+    logging.debug("Add your actual code here")
 
 if __name__ == "__main__":
     ddos_onion()
+
