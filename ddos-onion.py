@@ -49,7 +49,8 @@ def init_socket(ip: str, args, identity):
 
 def ddos_onion():
     # Main function of the program
-    # Place the rest of your code here
+    print("Hello, ddos-onion!")
+    # Add your actual code here
 
 if __name__ == "__main__":
     ddos_onion()
