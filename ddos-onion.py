@@ -15,7 +15,7 @@ def generate_fake_identity():
 def send_line(s, line, identity):
     line = f"{line}\r\n"
     s.send(line.encode("utf-8"))
-    s.send_line(f"X-Identity: {identity}")
+    s.send(f"X-Identity: {identity}\r\n".encode("utf-8"))
 
 def init_socket(ip: str, port, identity):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,11 +23,11 @@ def init_socket(ip: str, port, identity):
 
     s.connect((ip, port))
 
-    s.send_line(f"GET /?{random.randint(0, 2000)} HTTP/1.1", identity)
+    send_line(s, f"GET /?{random.randint(0, 2000)} HTTP/1.1", identity)
 
     ua = DEFAULT_USER_AGENTS[0]
-    s.send_line(f"User-Agent: {ua}", identity)
-    s.send_line("Accept-language: en-US,en,q=0.5", identity)
+    send_line(s, f"User-Agent: {ua}", identity)
+    send_line(s, "Accept-language: en-US,en,q=0.5", identity)
 
     return s
 
