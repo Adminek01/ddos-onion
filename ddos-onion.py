@@ -2,7 +2,7 @@ import socket
 import ssl
 import random
 import logging
-import argparse
+from argparse import ArgumentParser
 
 DEFAULT_USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/5.3",
